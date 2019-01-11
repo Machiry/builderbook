@@ -37,6 +37,14 @@ function withLayout(BaseComponent) {
     }
   }
 
+  App.getInitialProps = (ctx) => {
+    if (BaseComponent.getInitialProps) {
+      return BaseComponent.getInitialProps(ctx);
+    }
+
+    return {};
+  };
+
   App.propTypes = {
     pageContext: PropTypes.object, // eslint-disable-line
   };
