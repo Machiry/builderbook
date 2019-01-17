@@ -8,7 +8,7 @@ import mongoose from 'mongoose';
 import session from 'express-session';
 import mongoSessionStore from 'connect-mongo';
 
-import User from './models/User';
+import auth from './google';
 
 dotenv.config();
 
@@ -20,7 +20,7 @@ const options = {
   useCreateIndex: true,
   useFindAndModify: false,
 };
- mongoose.connect(
+mongoose.connect(
   MONGO_URL,
   options,
 );
@@ -40,7 +40,7 @@ app.prepare().then(() => {
 
   const sess = {
     name: 'builderbook.sid',
-    secret: 'HD2w.)q*VqRT4/#NK2M/,E^B)}FED5fWU!dKe[wk',
+    secret: 'HD2w.)q*VqRT4/#TK2P/,E^B)}FED5fWU!dKe[wk',
     store: new MongoStore({
       mongooseConnection: mongoose.connection,
       ttl: 14 * 24 * 60 * 60, // save session 14 days
@@ -55,12 +55,7 @@ app.prepare().then(() => {
 
   server.use(session(sess));
 
-  // this is testing code, remove later
-  server.get('/', async (req, res) => {
-    req.session.foo = 'bar';
-    const user = await User.findOne({ slug: 'team-builder-book' });
-    app.render(req, res, '/', { user });
-  });
+  auth({ server, ROOT_URL });
 
   server.get('*', (req, res) => handle(req, res));
 

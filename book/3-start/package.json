@@ -5,8 +5,7 @@
   "scripts": {
     "build": "next build",
     "start": "next start",
-    "dev": "next",
-    "dev-express": "nodemon server/app.js --watch server --exec babel-node --presets=@babel/preset-env",
+    "dev": "nodemon server/app.js --watch server --exec babel-node --presets=@babel/preset-env",
     "lint": "eslint components pages lib server"
   },
   "dependencies": {
@@ -41,5 +40,8 @@
     "eslint-config-prettier": "^3.3.0",
     "eslint-plugin-prettier": "^3.0.0",
     "prettier": "^1.15.3"
+  },
+  "resolutions": {
+    "**/event-stream": "^4.0.1"
   }
 }
