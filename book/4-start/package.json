@@ -6,7 +6,11 @@
     "build": "next build",
     "start": "next start",
     "dev": "nodemon server/app.js --watch server --exec babel-node --presets=@babel/preset-env",
-    "lint": "eslint components pages lib server"
+    "lint": "eslint components pages lib server",
+    "test": "jest --coverage"
+  },
+  "jest": {
+    "coverageDirectory": "./.coverage"
   },
   "dependencies": {
     "@babel/core": "^7.1.2",
@@ -45,5 +49,8 @@
     "eslint-config-prettier": "^3.3.0",
     "eslint-plugin-prettier": "^3.0.0",
     "prettier": "^1.15.3"
+  },
+  "resolutions": {
+    "**/event-stream": "^4.0.1"
   }
 }

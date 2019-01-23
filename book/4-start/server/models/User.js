@@ -2,6 +2,9 @@ import mongoose from 'mongoose';
 import _ from 'lodash';
 
 import generateSlug from '../utils/slugify';
+import getEmailTemplate from './EmailTemplate';
+import sendEmail from '../aws';
+import logger from '../logs';
 
 const { Schema } = mongoose;
 
@@ -52,14 +55,12 @@ class UserClass {
     return ['id', 'displayName', 'email', 'avatarUrl', 'slug', 'isAdmin', 'isGithubConnected'];
   }
 
-  static async signInOrSignUp({
-    googleId, email, googleToken, displayName, avatarUrl,
-  }) {
+  static async signInOrSignUp({ googleId, email, googleToken, displayName, avatarUrl }) {
     const user = await this.findOne({ googleId }).select(UserClass.publicFields().join(' '));
 
     if (user) {
       const modifier = {};
-      
+
       if (googleToken.accessToken) {
         modifier.access_token = googleToken.accessToken;
       }
@@ -91,6 +92,19 @@ class UserClass {
       isAdmin: userCount === 0,
     });
 
+    const template = await getEmailTemplate('welcome', { userName: displayName });
+
+    try {
+      await sendEmail({
+        from: `Aravind from Builder Book <${process.env.EMAIL_SUPPORT_FROM_ADDRESS}>`,
+        to: [email],
+        subject: template.subject,
+        body: template.message,
+      });
+    } catch (err) {
+      logger.error('Email sending error ', err);
+    }
+
     return _.pick(newUser, UserClass.publicFields());
   }
 }
@@ -100,4 +114,3 @@ mongoSchema.loadClass(UserClass);
 const User = mongoose.model('User', mongoSchema);
 
 export default User;
-
