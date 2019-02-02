@@ -4,10 +4,8 @@ import Router from 'next/router';
 
 let globalUser = null;
 
-export default (
-  Page,
-  { loginRequired = true, logoutRequired = false } = {},
-) => class BaseComponent extends React.Component {
+export default (Page, { loginRequired = true, logoutRequired = false } = {}) =>
+  class BaseComponent extends React.Component {
     static propTypes = {
       user: PropTypes.shape({
         id: PropTypes.string,
@@ -28,7 +26,7 @@ export default (
       }
 
       if (loginRequired && !logoutRequired && !user) {
-        Router.push('/login');
+        Router.push('/public/login', '/login');
         return;
       }
 
@@ -67,4 +65,4 @@ export default (
 
       return <Page {...this.props} />;
     }
-};
+  };

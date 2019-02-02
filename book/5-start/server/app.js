@@ -3,10 +3,11 @@ import session from 'express-session';
 import mongoSessionStore from 'connect-mongo';
 import next from 'next';
 import mongoose from 'mongoose';
-
 import auth from './google';
 
 import logger from './logs';
+
+const api = require('./api');
 
 require('dotenv').config();
 
@@ -18,10 +19,12 @@ const options = {
   useCreateIndex: true,
   useFindAndModify: false,
 };
-mongoose.connect(
-  MONGO_URL,
-  options,
-);
+
+const URL_MAP = {
+  '/login': '/public/login',
+};
+
+mongoose.connect(MONGO_URL, options);
 
 const port = process.env.PORT || 8000;
 const ROOT_URL = `http://localhost:${port}`;
@@ -52,7 +55,20 @@ app.prepare().then(() => {
 
   auth({ server, ROOT_URL });
 
-  server.get('*', (req, res) => handle(req, res));
+  api(server);
+
+  server.get('/books/:bookSlug/:chapterSlug', (req, res) => {
+    const { bookSlug, chapterSlug } = req.params;
+    app.render(req, res, '/public/read-chapter', { bookSlug, chapterSlug });
+  });
+  server.get('*', (req, res) => {
+    const url = URL_MAP[req.path];
+    if (url) {
+      app.render(req, res, url);
+    } else {
+      handle(req, res);
+    }
+  });
 
   server.listen(port, (err) => {
     if (err) throw err;
